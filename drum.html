@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drum Pad</title>
+    <link rel="stylesheet" href="drumstyle.css">
+</head>
+<body>
+    <button class="open-btn" onclick="openNav()">☰ Menu</button>
+
+    <!-- Navigation Bar -->
+    <div class="nav" id="nav">
+        <span class="close-btn" onclick="closeNav()">×</span>
+        <a href="index.html">Home</a>
+        <a href="drum.html">Drum Pad</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+    </div>
+
+    <div class="drum-container">
+        <h1>Drum Pad</h1>
+        <div class="drum-grid">
+            <div class="drum-pad" data-sound="kick">Kick</div>
+            <div class="drum-pad" data-sound="snare">Snare</div>
+            <div class="drum-pad" data-sound="hihat">HiHat</div>
+            <div class="drum-pad" data-sound="clap">Clap</div>
+            <div class="drum-pad" data-sound="tom">Tom</div>
+            <div class="drum-pad" data-sound="cymbal">Cymbal</div>
+            <div class="drum-pad" data-sound="ride">Ride</div>
+            <div class="drum-pad" data-sound="rimshot">Rimshot</div>
+        </div>
+    </div>
+    <div>
+        <div class="controls">
+            <button id="record-btn">Record</button>
+            <button id="stop-btn">Stop</button>
+            <button id="play-btn">Play</button>
+        </div>
+        
+    </div>
+    <script src="drum.js"></script>
+</body>
+</html>

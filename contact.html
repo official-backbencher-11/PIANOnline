@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | PIANOnline</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Navigation Bar Styles */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .nav {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background: #333;
+      color: #fff;
+      transition: 0.3s;
+      padding-top: 60px;
+    }
+    .nav a {
+      padding: 10px 20px;
+      text-decoration: none;
+      display: block;
+      color: #ddd;
+      transition: 0.3s;
+    }
+    .nav a:hover {
+      background: #575757;
+      color: #fff;
+    }
+    .open-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: #333;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 25px;
+      cursor: pointer;
+      color: white;
+    }
+    /* Contact Form Styles */
+    .content {
+      margin-left: 20px;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    form {
+      background: #f4f4f4;
+      padding: 20px;
+      max-width: 500px;
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    form input, form textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    form button {
+      background: #333;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    form button:hover {
+      background: #575757;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Button -->
+  <button class="open-btn" onclick="openNav()">☰ Menu</button>
+
+  <!-- Navigation Bar -->
+  <div class="nav" id="nav">
+    <span class="close-btn" onclick="closeNav()">×</span>
+    <a href="index.html">Home</a>
+    <a href="drum.html">Drum Pad</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+
+  </div>
+
+  <div class="content">
+    <h1>Contact Us</h1>
+    <p>
+      Have questions, suggestions, or feedback? We'd love to hear from you! Use the form below to get in touch with us.
+    </p>
+
+    <!-- Form -->
+    <form action="mailto:subsweb77@gmail.com" method="post" enctype="text/plain">
+      <label for="name">Your Name</label>
+      <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+      <label for="email">Your Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+      <label for="message">Your Message</label>
+      <textarea id="message" name="message" rows="5" placeholder="Enter your message" required></textarea>
+
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    function openNav() {
+      document.getElementById("nav").style.left = "0";
+    }
+    function closeNav() {
+      document.getElementById("nav").style.left = "-250px";
+    }
+  </script>
+</body>
+</html>

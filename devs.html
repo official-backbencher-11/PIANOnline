@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meet the Devs | PIANOnline</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* General Styles */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin: 15px;
+      padding: 20px;
+      text-align: center;
+      width: 250px;
+      transition: 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    .card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+    .card h3 {
+      margin: 10px 0;
+      color: #333;
+    }
+    .social-links a {
+      margin: 0 8px;
+      text-decoration: none;
+      color: #555;
+      font-size: 20px;
+      transition: 0.3s;
+    }
+    .social-links a:hover {
+      color: #0077b5; /* LinkedIn Blue */
+    }
+    /* Sliding Navigation Bar */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: -250px; /* Hidden initially */
+      width: 250px;
+      height: 100%;
+      background: #333;
+      color: #fff;
+      transition: 0.3s;
+      padding-top: 60px;
+    }
+    .nav a {
+      padding: 10px 20px;
+      text-decoration: none;
+      display: block;
+      color: #ddd;
+      transition: 0.3s;
+    }
+    .nav a:hover {
+      background: #575757;
+      color: #fff;
+    }
+    .open-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: #333;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 25px;
+      cursor: pointer;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Button -->
+  <button class="open-btn" onclick="openNav()">☰ Menu</button>
+
+  <!-- Navigation Bar -->
+  <div class="nav" id="nav">
+    <span class="close-btn" onclick="closeNav()">×</span>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="devs.html">Devs</a>
+  </div>
+
+  <!-- Devs Section -->
+  <h1>Meet the Developers</h1>
+  <div class="container">
+    <div class="card">
+      <img src="pics/shivam.jpg" alt="Developer Image">
+      <h3>Shivam Singh</h3>
+      <div class="social-links">
+        <a href="https://github.com/official-backbencher-11" target="_blank"><i>GitHub</i></a>
+        <a href="https://linkedin.com/in/shivam-singh-654080298" target="_blank"><i>LinkedIn</i></a>
+        <a href="https://instagram.com/_official_backbencher_11" target="_blank"><i>Instagram</i></a>
+      </div>
+    </div>
+    
+    <div class="card">
+      <img src="pics/subrat.jpeg" alt="Developer Image">
+      <h3>Subrat Dwivedi</h3>
+      <div class="social-links">
+        <a href="https://github.com/subrat-dwi" target="_blank"><i>GitHub</i></a>
+        <a href="https://linkedin.com/in/subrat-dwivedi" target="_blank"><i>LinkedIn</i></a>
+        <a href="https://instagram.com/dw1subrat" target="_blank"><i>Instagram</i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    function openNav() {
+      document.getElementById("nav").style.left = "0";
+    }
+    function closeNav() {
+      document.getElementById("nav").style.left = "-250px";
+    }
+  </script>
+</body>
+</html>

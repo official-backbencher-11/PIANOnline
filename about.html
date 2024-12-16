@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | PIANOnline</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Navigation Bar Styles */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .nav {
+      position: fixed;
+      top: 0;
+      left: -250px; 
+      width: 250px;
+      height: 100%;
+      background: #333;
+      color: #fff;
+      transition: 0.3s;
+      padding-top: 60px;
+    }
+    .nav a {
+      padding: 10px 20px;
+      text-decoration: none;
+      display: block;
+      color: #ddd;
+      transition: 0.3s;
+    }
+    .nav a:hover {
+      background: #575757;
+      color: #fff;
+    }
+    .open-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: #333;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 25px;
+      cursor: pointer;
+      color: white;
+    }
+    /* Content Styles */
+    .content {
+      margin-left: 20px;
+      padding: 20px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Button -->
+  <button class="open-btn" onclick="openNav()">☰ Menu</button>
+
+  <!-- Navigation Bar -->
+  <div class="nav" id="nav">
+    <span class="close-btn" onclick="closeNav()">×</span>
+    <a href="index.html">Home</a>
+    <a href="drum.html">Drum Pad</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  
+  <div class="content">
+    <h1>About PIANOnline</h1>
+    <p>
+      Welcome to <strong>PIANOnline</strong>! This platform is designed to provide a fun and interactive way for music lovers to explore piano sounds and enhance their musical skills. Whether you're a beginner experimenting with basic notes or an experienced pianist looking to play melodies on the go, PIANOnline has something for you.
+    </p>
+    <h2>Features</h2>
+    <ul>
+      <li>Fully playable virtual piano using keyboard keys.</li>
+      <li>Volume control for better sound customization.</li>
+      <li>Recording functionality to save and replay your creations.</li>
+      <li>Interactive drum pad for an all-around musical experience.</li>
+    </ul>
+    <h2>Our Mission</h2>
+    <p>
+      Our mission is to make music accessible to everyone, everywhere. We believe that music can bring joy and creativity into people's lives, and this tool is designed to make playing and learning music simple and enjoyable.
+    </p>
+    <h2>Contact</h2>
+    <p>
+      If you have any suggestions, feedback, or inquiries, feel free to reach out to us. We'd love to hear from you!
+    </p>
+    <p>Email: subsweb77@gmail.com</p>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    function openNav() {
+      document.getElementById("nav").style.left = "0";
+    }
+    function closeNav() {
+      document.getElementById("nav").style.left = "-250px";
+    }
+  </script>
+</body>
+</html>

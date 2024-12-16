@@ -1,0 +1,154 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    animation: backgroundShift 10s ease infinite;
+  }
+  
+  @keyframes backgroundShift {
+    0% {
+      background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    }
+    50% {
+      background: linear-gradient(135deg, #BBDEFB 0%, #E3F2FD 100%);
+    }
+    100% {
+      background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    }
+  }
+  
+.drum-container {
+    margin-top: 20px;
+}
+
+h1 {
+    font-size: 3em;
+    color: #ff4081;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+/* Grid Design for Drum Pads */
+.drum-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    transition: transform 0.3s ease;
+}
+
+.drum-pad {
+    background: linear-gradient(145deg, #333, #444);
+    border: 2px solid #555;
+    border-radius: 15px;
+    padding: 40px;
+    font-size: 2em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    user-select: none;
+}
+
+.drum-pad:hover {
+    background: linear-gradient(145deg, #555, #666);
+    transform: scale(1.1);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+}
+
+.drum-pad.active {
+    background-color: #00e676;
+    box-shadow: 0 0 25px #00e676, 0 0 50px rgba(0, 230, 118, 0.5);
+    transform: scale(1.05);
+    transition: all 0.1s ease;
+}
+
+.drum-pad:active {
+    background-color: #ff4081;
+    box-shadow: 0 0 15px #ff4081;
+    transform: scale(1.15);
+}
+
+/* Controls Styling */
+.controls {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.controls button {
+    background: #444;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.controls button:hover {
+    background-color: #777;
+    transform: translateY(-5px);
+}
+
+.controls button:active {
+    background-color: #ff4081;
+    box-shadow: 0 0 15px #ff4081;
+    transform: translateY(2px);
+}
+
+.nav {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background: #333;
+    color: #fff;
+    transition: 0.3s;
+    padding-top: 60px;
+    text-align: left;
+  }
+  .nav a {
+    padding: 10px 20px;
+    text-decoration: none;
+    display: block;
+    color: #ddd;
+    transition: 0.3s;
+  }
+  .nav a:hover {
+    background: #575757;
+    color: #fff;
+  }
+  .open-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #333;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+  }
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 25px;
+    cursor: pointer;
+    color: white;
+  }

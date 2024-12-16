@@ -32,7 +32,7 @@ A responsive and interactive **Piano and Drum Kit** web application built using 
 
 ## 🎥 Demo  
 Check out the live project here:  
-**[PIANOnline on GitHub Pages](https://subrat-dwi.github.io/PIANOnline/)**  
+**[PIANOnline on GitHub Pages](https://official-backbencher-11.github.io/PIANOnline/)**  
 
 ---
 
@@ -49,7 +49,7 @@ Check out the live project here:
 
 1. **Clone the Repository**:  
    ```bash
-   git clone https://github.com/subrat-dwi/PIANOnline.git
+   git clone https://github.com/official-backbencher-11/PIANOnline.git
    ```
 
 2. **Open in Browser**:  
@@ -86,7 +86,7 @@ We welcome contributions to improve the project!
 ## 📧 Contact  
 
 For any inquiries or suggestions, feel free to reach out:  
-- **Email**: subsweb@gmail.com  
+- **Email**: shivamsinghjan791@gmail.com  
 
 ---
 

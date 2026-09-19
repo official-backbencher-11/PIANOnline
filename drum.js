@@ -6,7 +6,6 @@
   const recordBtn = document.querySelector("#record-btn");
   const stopBtn = document.querySelector("#stop-btn");
   const playBtn = document.querySelector("#play-btn");
-  const saveBtn = document.querySelector("#save-btn");
   const nav = document.querySelector("#nav");
 
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -141,7 +140,6 @@
         recordingBlob = new Blob(chunks, { type: mediaRecorder.mimeType || type });
         recordingUrl = URL.createObjectURL(recordingBlob);
         playBtn.disabled = !recordingBlob.size;
-        saveBtn.disabled = !recordingBlob.size;
         setStatus(recordingBlob.size ? "Recording ready." : "No audio was captured.");
       }, { once: true });
       mediaRecorder.start(100);
@@ -149,7 +147,6 @@
       recordBtn.disabled = true;
       stopBtn.disabled = false;
       playBtn.disabled = true;
-      saveBtn.disabled = true;
       setStatus("Recording…");
     } catch (error) {
       console.error(error);

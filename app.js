@@ -23,6 +23,7 @@
   let recordDestination = null;
   let decodedBuffers = new Map();
   let isLoading = false;
+  let loadPromise = null;
   let isRecording = false;
   let mediaRecorder = null;
   let recordedChunks = [];
@@ -81,36 +82,38 @@
     const candidates = [
       "audio/webm;codecs=opus",
       "audio/webm",
-      "audio/ogg;codecs=opus"
+      "audio/ogg;codecs=opus",
+      "audio/mp4"
     ];
     return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || "";
   }
 
-  async function loadPianoSounds() {
-    if (isLoading || decodedBuffers.size === audioFiles.size) return;
+  function loadPianoSounds() {
+    if (decodedBuffers.size === audioFiles.size) return Promise.resolve();
+    if (loadPromise) return loadPromise;
     isLoading = true;
     setAudioStatus("Loading piano sounds…");
-
-    try {
-      const context = await ensureAudioContext();
-      const entries = [...audioFiles.entries()];
-
-      await Promise.all(entries.map(async ([key, url]) => {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Could not load ${url}`);
-        const arrayBuffer = await response.arrayBuffer();
-        const audioBuffer = await context.decodeAudioData(arrayBuffer);
-        decodedBuffers.set(key, audioBuffer);
-      }));
-
-      setAudioStatus("Piano ready — use A W S E D F T G Y H U J K O L P ;");
-    } catch (error) {
-      console.error(error);
-      setAudioStatus("Could not load the piano sounds. Check that the audio files exist.");
-      throw error;
-    } finally {
-      isLoading = false;
-    }
+    loadPromise = (async () => {
+      try {
+        const context = await ensureAudioContext();
+        await Promise.all([...audioFiles.entries()].map(async ([key, url]) => {
+          if (decodedBuffers.has(key)) return;
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`Could not load ${url}`);
+          const arrayBuffer = await response.arrayBuffer();
+          decodedBuffers.set(key, await context.decodeAudioData(arrayBuffer));
+        }));
+        setAudioStatus("Piano ready — use A W S E D F T G Y H U J K O L P ;");
+      } catch (error) {
+        console.error(error);
+        setAudioStatus("Could not load the piano sounds. Check that the audio files exist.");
+        throw error;
+      } finally {
+        isLoading = false;
+        loadPromise = null;
+      }
+    })();
+    return loadPromise;
   }
 
   function markKey(keyValue) {
@@ -276,7 +279,7 @@
       return;
     }
 
-    const extension = recordingBlob.type.includes("ogg") ? "ogg" : "webm";
+    const extension = recordingBlob.type.includes("ogg") ? "ogg" : recordingBlob.type.includes("mp4") ? "m4a" : "webm";
     const url = URL.createObjectURL(recordingBlob);
     const link = document.createElement("a");
     link.href = url;

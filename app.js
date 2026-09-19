@@ -2,17 +2,17 @@
   "use strict";
 
   const pianoKeys = [...document.querySelectorAll(".piano-keys .key")];
-  const volumeSlider = document.querySelector("#volume-slider");
-  const keysCheckbox = document.querySelector("#keys-checkbox");
+  const volumeSlider = document.querySelector(".volume-slider input");
+  const keysCheckbox = document.querySelector(".keys-checkbox input");
   const startRecBtn = document.querySelector("#start-recording");
   const stopRecBtn = document.querySelector("#stop-recording");
   const playRecBtn = document.querySelector("#play-recording");
   const saveRecBtn = document.querySelector("#save-recording");
   const statusEl = document.querySelector("#recording-status");
   const audioStatusEl = document.querySelector("#audio-status");
-  const navToggle = document.querySelector("#nav-toggle");
-  const navClose = document.querySelector("#nav-close");
-  const nav = document.querySelector("#site-nav");
+  const navToggle = document.querySelector(".nav-toggle");
+  const navClose = document.querySelector(".nav-bar .close-btn");
+  const nav = document.querySelector("#nav-bar");
 
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const allKeys = new Set(pianoKeys.map((key) => key.dataset.key));
@@ -315,7 +315,7 @@
   });
 
   keysCheckbox.addEventListener("change", () => {
-    document.querySelector(".piano-keys").classList.toggle("hide-labels", !keysCheckbox.checked);
+    document.querySelector(".piano-keys").classList.toggle("hide", !keysCheckbox.checked);
   });
 
   startRecBtn.addEventListener("click", startRecording);

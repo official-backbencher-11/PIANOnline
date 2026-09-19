@@ -7,9 +7,7 @@
   const stopBtn = document.querySelector("#stop-btn");
   const playBtn = document.querySelector("#play-btn");
   const saveBtn = document.querySelector("#save-btn");
-  const navToggle = document.querySelector("#nav-toggle");
-  const navClose = document.querySelector("#nav-close");
-  const nav = document.querySelector("#site-nav");
+  const nav = document.querySelector("#nav");
 
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const sounds = new Map([
@@ -42,7 +40,7 @@
   let timers = [];
 
   function setStatus(message) {
-    statusEl.textContent = message;
+    if (statusEl) statusEl.textContent = message;
   }
 
   async function ensureAudio() {
@@ -222,21 +220,9 @@
   recordBtn.addEventListener("click", startRecording);
   stopBtn.addEventListener("click", stopRecording);
   playBtn.addEventListener("click", playRecording);
-  saveBtn.addEventListener("click", saveRecording);
 
-  navToggle.addEventListener("click", () => {
-    nav.classList.add("open");
-    navToggle.setAttribute("aria-expanded", "true");
-  });
-  navClose.addEventListener("click", () => {
-    nav.classList.remove("open");
-    navToggle.setAttribute("aria-expanded", "false");
-    navToggle.focus();
-  });
-  nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
-    nav.classList.remove("open");
-    navToggle.setAttribute("aria-expanded", "false");
-  }));
+  window.openNav = () => { if (nav) nav.style.left = "0"; };
+  window.closeNav = () => { if (nav) nav.style.left = "-250px"; };
 
   window.addEventListener("pagehide", () => {
     clearTimers();

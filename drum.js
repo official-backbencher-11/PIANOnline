@@ -31,6 +31,7 @@
   let masterGain = null;
   let recordDestination = null;
   let buffers = new Map();
+  let loadPromise = null;
   let mediaRecorder = null;
   let chunks = [];
   let recordingBlob = null;
@@ -59,23 +60,30 @@
 
   function mimeType() {
     if (!window.MediaRecorder) return "";
-    return ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"]
+    return ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/mp4"]
       .find((type) => MediaRecorder.isTypeSupported(type)) || "";
   }
 
-  async function loadSounds() {
-    if (buffers.size === sounds.size) return;
-    await ensureAudio();
-    setStatus("Loading drum sounds…");
-
-    await Promise.all([...sounds.entries()].map(async ([name, url]) => {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Could not load ${url}`);
-      const data = await response.arrayBuffer();
-      buffers.set(name, await context.decodeAudioData(data));
-    }));
-
-    setStatus("Drum pad ready — use A S D F G H J K.");
+  function loadSounds() {
+    if (buffers.size === sounds.size) return Promise.resolve();
+    if (loadPromise) return loadPromise;
+    loadPromise = (async () => {
+      await ensureAudio();
+      setStatus("Loading drum sounds…");
+      await Promise.all([...sounds.entries()].map(async ([name, url]) => {
+        if (buffers.has(name)) return;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Could not load ${url}`);
+        const data = await response.arrayBuffer();
+        buffers.set(name, await context.decodeAudioData(data));
+      }));
+      setStatus("Drum pad ready — use A S D F G H J K.");
+    })().catch((error) => {
+      console.error(error);
+      setStatus("Could not load the drum sounds.");
+      throw error;
+    }).finally(() => { loadPromise = null; });
+    return loadPromise;
   }
 
   function flashPad(name) {
@@ -184,7 +192,7 @@
 
   function saveRecording() {
     if (!recordingBlob?.size) return;
-    const extension = recordingBlob.type.includes("ogg") ? "ogg" : "webm";
+    const extension = recordingBlob.type.includes("ogg") ? "ogg" : recordingBlob.type.includes("mp4") ? "m4a" : "webm";
     const url = URL.createObjectURL(recordingBlob);
     const link = document.createElement("a");
     link.href = url;

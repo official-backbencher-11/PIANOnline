@@ -10,12 +10,13 @@ A responsive and interactive **Piano and Drum Kit** web application built using 
 - Keyboard support for quick access.
 - Volume control slider.
 - Option to show/hide key labels.
-- **Record and Save** your piano tunes.
+- **Record, replay, and save** piano output directly in the browser (microphone not required).
 
 ### 🥁 **Drum Kit**
 - Interactive drum pads with hover and click animations.
 - Keyboard support for faster drum sounds.
 - Active pad highlighting for visual feedback.
+- Record, replay, and save drum performances directly in the browser.
 
 ### 🌐 **Fully Responsive**
 - Designed to work on all screen sizes (Desktop, Tablet, Mobile).
@@ -53,7 +54,7 @@ Check out the live project here:
    ```
 
 2. **Open in Browser**:  
-   Open the `index.html` file in your browser.
+   Serve the folder from a local web server (recommended because browser security rules can block `fetch()`/audio assets from `file://`). For example: `python -m http.server 8000`, then open `http://localhost:8000`.
 
 3. **Explore**:  
    - Play piano 🎹.  
@@ -89,6 +90,10 @@ For any inquiries or suggestions, feel free to reach out:
 - **Email**: shivamsinghjan791@gmail.com  
 
 ---
+
+## 🔒 Privacy
+
+Recordings are processed locally in the browser and are not uploaded by this static site. The recorder captures the application's generated audio output and does not request microphone access.
 
 ## 📄 License  
 

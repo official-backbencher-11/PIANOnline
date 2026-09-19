@@ -1,165 +1,336 @@
-const pianoKeys = document.querySelectorAll(".piano-keys .key"),
-    volumeSlider = document.querySelector(".volume-slider"),
-    keysCheckbox = document.querySelector(".keys-checkbox"),
-    startRecBtn = document.querySelector("#start-recording"),
-    stopRecBtn = document.querySelector("#stop-recording"),
-    playRecBtn = document.querySelector("#play-recording"),
-    saveRecBtn = document.querySelector("#save-recording");
+(() => {
+  "use strict";
 
-function openNav() {
-    document.getElementById("nav-bar").style.left = "0";
-}
-function closeNav() {
-    document.getElementById("nav-bar").style.left = "-250px";
-}
+  const pianoKeys = [...document.querySelectorAll(".piano-keys .key")];
+  const volumeSlider = document.querySelector("#volume-slider");
+  const keysCheckbox = document.querySelector("#keys-checkbox");
+  const startRecBtn = document.querySelector("#start-recording");
+  const stopRecBtn = document.querySelector("#stop-recording");
+  const playRecBtn = document.querySelector("#play-recording");
+  const saveRecBtn = document.querySelector("#save-recording");
+  const statusEl = document.querySelector("#recording-status");
+  const audioStatusEl = document.querySelector("#audio-status");
+  const navToggle = document.querySelector("#nav-toggle");
+  const navClose = document.querySelector("#nav-close");
+  const nav = document.querySelector("#site-nav");
 
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const allKeys = new Set(pianoKeys.map((key) => key.dataset.key));
+  const audioFiles = new Map(pianoKeys.map((key) => [key.dataset.key, `tunes/${key.dataset.key}.wav`]));
 
-let mediaRecorder;
-let recordedChunks = [];
-let audioStream;
-let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let destination;
+  let audioContext = null;
+  let masterGain = null;
+  let recordDestination = null;
+  let decodedBuffers = new Map();
+  let isLoading = false;
+  let isRecording = false;
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let recordingBlob = null;
+  let recordingUrl = null;
+  let recordedKeys = [];
+  let recordedTimes = [];
+  let recordingStartTime = 0;
+  let playbackTimers = [];
+  let activeSources = new Set();
 
-let allKeys = [],
-    audio = new Audio(),
-    recordedKeys = [],
-    recordedTimes = [],
-    recordingStartTime;
+  function setStatus(message) {
+    if (statusEl) statusEl.textContent = message;
+  }
 
-let isRecording = false;
+  function setAudioStatus(message) {
+    if (audioStatusEl) audioStatusEl.textContent = message;
+  }
 
-const playTune = (key) => {
-    audio.src = `tunes/${key}.wav`; // passing audio src based on key pressed
-    audio.play(); // playing audio
+  function openNav() {
+    nav.classList.add("open");
+    navToggle.setAttribute("aria-expanded", "true");
+    navClose.focus();
+  }
 
-    const clickedKey = document.querySelector(`[data-key="${key}"]`); // getting clicked key element
-    clickedKey.classList.add("active"); // adding active class to the clicked key element
-    setTimeout(() => { // removing active class after 150 ms from the clicked key element
-        clickedKey.classList.remove("active");
-    }, 150);
-}
+  function closeNav() {
+    nav.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+    navToggle.focus();
+  }
 
-pianoKeys.forEach(key => {
-    allKeys.push(key.dataset.key); // adding data-key value to the allKeys array
-    // calling playTune function with passing data-key value as an argument
-    key.addEventListener("click", () => {
-        if (isRecording) {
-            const currentTime = Date.now() - recordingStartTime;
-            recordedKeys.push(key.dataset.key);
-            recordedTimes.push(currentTime);
-        }
-        playTune(key.dataset.key);
+  async function ensureAudioContext() {
+    if (!AudioContextClass) {
+      throw new Error("Web Audio API is not supported by this browser.");
+    }
+
+    if (!audioContext) {
+      audioContext = new AudioContextClass();
+      masterGain = audioContext.createGain();
+      masterGain.gain.value = Number(volumeSlider.value);
+      masterGain.connect(audioContext.destination);
+
+      recordDestination = audioContext.createMediaStreamDestination();
+      masterGain.connect(recordDestination);
+    }
+
+    if (audioContext.state === "suspended") {
+      await audioContext.resume();
+    }
+
+    return audioContext;
+  }
+
+  function getSupportedRecorderMimeType() {
+    if (!window.MediaRecorder) return "";
+    const candidates = [
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/ogg;codecs=opus"
+    ];
+    return candidates.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+  }
+
+  async function loadPianoSounds() {
+    if (isLoading || decodedBuffers.size === audioFiles.size) return;
+    isLoading = true;
+    setAudioStatus("Loading piano sounds…");
+
+    try {
+      const context = await ensureAudioContext();
+      const entries = [...audioFiles.entries()];
+
+      await Promise.all(entries.map(async ([key, url]) => {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Could not load ${url}`);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await context.decodeAudioData(arrayBuffer);
+        decodedBuffers.set(key, audioBuffer);
+      }));
+
+      setAudioStatus("Piano ready — use A W S E D F T G Y H U J K O L P ;");
+    } catch (error) {
+      console.error(error);
+      setAudioStatus("Could not load the piano sounds. Check that the audio files exist.");
+      throw error;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  function markKey(keyValue) {
+    const keyElement = document.querySelector(`.key[data-key="${CSS.escape(keyValue)}"]`);
+    if (!keyElement) return;
+    keyElement.classList.add("active");
+    window.setTimeout(() => keyElement.classList.remove("active"), 120);
+  }
+
+  async function playTune(keyValue, shouldRecord = true) {
+    if (!allKeys.has(keyValue)) return;
+
+    try {
+      const context = await ensureAudioContext();
+      if (!decodedBuffers.has(keyValue)) {
+        await loadPianoSounds();
+      }
+
+      const buffer = decodedBuffers.get(keyValue);
+      if (!buffer) return;
+
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(masterGain);
+      activeSources.add(source);
+      source.addEventListener("ended", () => {
+        activeSources.delete(source);
+        source.disconnect();
+      }, { once: true });
+
+      source.start();
+      markKey(keyValue);
+
+      if (isRecording && shouldRecord) {
+        recordedKeys.push(keyValue);
+        recordedTimes.push(performance.now() - recordingStartTime);
+      }
+    } catch (error) {
+      console.error(error);
+      setAudioStatus("Audio could not start. Try clicking the piano again.");
+    }
+  }
+
+  function clearPlaybackTimers() {
+    playbackTimers.forEach((timer) => window.clearTimeout(timer));
+    playbackTimers = [];
+  }
+
+  function stopAllSources() {
+    activeSources.forEach((source) => {
+      try { source.stop(); } catch (_) {}
     });
-});
+    activeSources.clear();
+  }
 
-const handleVolume = (e) => {
-    audio.volume = e.target.value; // passing the range slider value as an audio volume
-}
-
-const startRecording = () => {
-    // Reset previous recording data
+  function resetRecordingState() {
     recordedChunks = [];
     recordedKeys = [];
     recordedTimes = [];
-    recordingStartTime = Date.now();
-    isRecording = true;
+    recordingBlob = null;
 
-    // Create a new audio context and set up a media stream
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            audioStream = stream;
-            destination = audioContext.createMediaStreamDestination();
+    if (recordingUrl) {
+      URL.revokeObjectURL(recordingUrl);
+      recordingUrl = null;
+    }
+  }
 
-            // Create the MediaRecorder for capturing the audio stream
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.ondataavailable = event => {
-                recordedChunks.push(event.data); // Save the chunks of audio data
-            };
+  async function startRecording() {
+    if (isRecording) return;
 
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(recordedChunks, { type: 'audio/webm' }); // Create a blob from the recorded data
-                const audioUrl = URL.createObjectURL(blob); // Create an object URL for the audio blob
-            };
+    try {
+      const context = await ensureAudioContext();
+      await loadPianoSounds();
 
-            // Start recording
-            mediaRecorder.start();
-            startRecBtn.disabled = true;
-            stopRecBtn.disabled = false;
-            playRecBtn.disabled = true;
-            saveRecBtn.disabled = true;
-        })
-        .catch(err => {
-            console.error("Error accessing microphone: ", err);
-        });
-};
+      if (!window.MediaRecorder || !recordDestination) {
+        throw new Error("This browser does not support audio recording.");
+      }
 
-const stopRecording = () => {
-    mediaRecorder.stop(); // Stop the recording
-    audioStream.getTracks().forEach(track => track.stop()); // Stop the media stream
-    audioContext.close();  // Close the audio context to free resources
+      const mimeType = getSupportedRecorderMimeType();
+      if (!mimeType) {
+        throw new Error("No supported audio recording format is available.");
+      }
+
+      resetRecordingState();
+      recordingStartTime = performance.now();
+      isRecording = true;
+      mediaRecorder = new MediaRecorder(recordDestination.stream, { mimeType });
+      mediaRecorder.addEventListener("dataavailable", (event) => {
+        if (event.data && event.data.size > 0) recordedChunks.push(event.data);
+      });
+      mediaRecorder.addEventListener("stop", finalizeRecording, { once: true });
+      mediaRecorder.start(100);
+
+      startRecBtn.disabled = true;
+      stopRecBtn.disabled = false;
+      playRecBtn.disabled = true;
+      saveRecBtn.disabled = true;
+      setStatus("Recording… play the piano.");
+      setAudioStatus("Recording the piano output directly — microphone access is not used.");
+    } catch (error) {
+      console.error(error);
+      isRecording = false;
+      setStatus(error.message || "Recording could not start.");
+      startRecBtn.disabled = false;
+      stopRecBtn.disabled = true;
+    }
+  }
+
+  function finalizeRecording() {
+    const mimeType = mediaRecorder?.mimeType || "audio/webm";
+    recordingBlob = new Blob(recordedChunks, { type: mimeType });
+
+    if (recordingUrl) URL.revokeObjectURL(recordingUrl);
+    recordingUrl = URL.createObjectURL(recordingBlob);
+
+    playRecBtn.disabled = recordingBlob.size === 0;
+    saveRecBtn.disabled = recordingBlob.size === 0;
+    setStatus(recordingBlob.size ? "Recording ready to play or save." : "No audio was captured.");
+  }
+
+  function stopRecording() {
+    if (!isRecording) return;
 
     isRecording = false;
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+    }
+
     startRecBtn.disabled = false;
     stopRecBtn.disabled = true;
-    playRecBtn.disabled = false;
-    saveRecBtn.disabled = false;
-}
+    setAudioStatus("Recording stopped.");
+  }
 
-const playRecording = () => {
-    let index = 0;
-    const startTime = Date.now(); // get the current time to calculate delays
+  function playRecordedPerformance() {
+    clearPlaybackTimers();
 
-    const playNextKey = () => {
-        if (index < recordedKeys.length) {
-            const key = recordedKeys[index];
-            const timeToWait = recordedTimes[index] - (Date.now() - startTime); // calculate delay for next key
-            if (timeToWait > 0) {
-                setTimeout(() => {
-                    playTune(key); // play the recorded key
-                    index++;
-                    playNextKey(); // call playNextKey recursively to continue playing
-                }, timeToWait);
-            } else {
-                playTune(key); // if the timeToWait is already passed, play immediately
-                index++;
-                playNextKey(); // continue to the next key
-            }
-        }
-    };
-
-    playNextKey(); // start playing the recording
-}
-
-const saveRecording = () => {
-    const blob = new Blob(recordedChunks, { type: 'audio/webm' }); // Create a blob from the recorded chunks
-    const url = URL.createObjectURL(blob); // Create an object URL for the blob
-    const link = document.createElement('a'); // Create a link element
-    link.href = url; // Set the href to the blob URL
-    link.download = 'piano-recording.webm'; // Set the default download filename
-    link.click(); // Programmatically click the link to start the download
-};
-
-const pressedKey = (e) => {
-    // if the pressed key is in the allKeys array, only call the playTune function
-    if (allKeys.includes(e.key)) {
-        if (isRecording) {
-            const currentTime = Date.now() - recordingStartTime; // record the time elapsed since recording started
-            recordedKeys.push(e.key); // record the key pressed
-            recordedTimes.push(currentTime); // record the time of the press
-        }
-        playTune(e.key);
+    if (recordingUrl) {
+      const audio = new Audio(recordingUrl);
+      audio.volume = 1;
+      audio.addEventListener("ended", () => URL.revokeObjectURL(audio.src), { once: true });
+      audio.play().catch((error) => {
+        console.error(error);
+        setStatus("Playback was blocked. Press Play Recording again.");
+      });
+      return;
     }
-}
 
-const showHideKeys = () => {
-    // toggle the visibility of piano keys
-    pianoKeys.forEach(key => key.classList.toggle("hide"));
-}
+    if (!recordedKeys.length) {
+      setStatus("There is no recording to play.");
+      return;
+    }
 
-startRecBtn.addEventListener("click", startRecording);
-stopRecBtn.addEventListener("click", stopRecording);
-playRecBtn.addEventListener("click", playRecording);
-saveRecBtn.addEventListener("click", saveRecording);
-keysCheckbox.addEventListener("click", showHideKeys);
-volumeSlider.addEventListener("input", handleVolume);
-document.addEventListener("keydown", pressedKey);
+    const startedAt = performance.now();
+    recordedKeys.forEach((keyValue, index) => {
+      const timer = window.setTimeout(() => playTune(keyValue, false), Math.max(0, recordedTimes[index] - (performance.now() - startedAt)));
+      playbackTimers.push(timer);
+    });
+  }
+
+  function saveRecording() {
+    if (!recordingBlob || !recordingBlob.size) {
+      setStatus("There is no audio recording to save.");
+      return;
+    }
+
+    const extension = recordingBlob.type.includes("ogg") ? "ogg" : "webm";
+    const url = URL.createObjectURL(recordingBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `pianonline-recording.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function handleKeyDown(event) {
+    if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const target = event.target;
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return;
+
+    const keyValue = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    if (!allKeys.has(keyValue)) return;
+
+    event.preventDefault();
+    playTune(keyValue);
+  }
+
+  pianoKeys.forEach((key) => {
+    key.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      playTune(key.dataset.key);
+    });
+  });
+
+  volumeSlider.addEventListener("input", () => {
+    if (masterGain) masterGain.gain.value = Number(volumeSlider.value);
+  });
+
+  keysCheckbox.addEventListener("change", () => {
+    document.querySelector(".piano-keys").classList.toggle("hide-labels", !keysCheckbox.checked);
+  });
+
+  startRecBtn.addEventListener("click", startRecording);
+  stopRecBtn.addEventListener("click", stopRecording);
+  playRecBtn.addEventListener("click", playRecordedPerformance);
+  saveRecBtn.addEventListener("click", saveRecording);
+
+  navToggle.addEventListener("click", openNav);
+  navClose.addEventListener("click", closeNav);
+  nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeNav));
+  document.addEventListener("keydown", handleKeyDown);
+
+  window.addEventListener("pagehide", () => {
+    clearPlaybackTimers();
+    stopAllSources();
+    if (recordingUrl) URL.revokeObjectURL(recordingUrl);
+    if (audioContext && audioContext.state !== "closed") audioContext.close();
+  });
+
+  loadPianoSounds().catch(() => {});
+})();

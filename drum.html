@@ -1,49 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="PIANOnline interactive drum pad with keyboard control and recording.">
-  <title>PIANOnline — Drum Pad</title>
-  <link rel="stylesheet" href="drumstyle.css">
-  <script src="drum.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drum Pad</title>
+    <link rel="stylesheet" href="drumstyle.css">
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="index.html">🎹 PIANOnline</a>
-    <button class="nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false">☰ Menu</button>
-    <nav class="nav" id="site-nav" aria-label="Main navigation">
-      <button class="close-btn" id="nav-close" type="button" aria-label="Close menu">×</button>
-      <a href="index.html">Piano</a>
-      <a href="drum.html" aria-current="page">Drum Pad</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-      <a href="devs.html">Developers</a>
-    </nav>
-  </header>
+    <button class="open-btn" onclick="openNav()">☰ Menu</button>
 
-  <main class="drum-container">
-    <p class="eyebrow">Play • Record • Replay</p>
-    <h1>Drum Pad</h1>
-    <p id="drum-status" role="status" aria-live="polite">Click a pad or use A S D F G H J K.</p>
+    <!-- Navigation Bar -->
+    <div class="nav" id="nav">
+        <span class="close-btn" onclick="closeNav()">×</span>
+        <a href="index.html">Home</a>
+        <a href="drum.html">Drum Pad</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+    </div>
 
-    <section class="drum-grid" aria-label="Drum pads">
-      <button class="drum-pad" data-sound="kick" type="button">Kick<small>A</small></button>
-      <button class="drum-pad" data-sound="snare" type="button">Snare<small>S</small></button>
-      <button class="drum-pad" data-sound="hihat" type="button">Hi-Hat<small>D</small></button>
-      <button class="drum-pad" data-sound="clap" type="button">Clap<small>F</small></button>
-      <button class="drum-pad" data-sound="tom" type="button">Tom<small>G</small></button>
-      <button class="drum-pad" data-sound="cymbal" type="button">Cymbal<small>H</small></button>
-      <button class="drum-pad" data-sound="ride" type="button">Ride<small>J</small></button>
-      <button class="drum-pad" data-sound="rimshot" type="button">Rimshot<small>K</small></button>
-    </section>
-
-    <section class="controls" aria-label="Drum recording controls">
-      <button id="record-btn" type="button">● Record</button>
-      <button id="stop-btn" type="button" disabled>■ Stop</button>
-      <button id="play-btn" type="button" disabled>▶ Play</button>
-      <button id="save-btn" type="button" disabled>⬇ Save</button>
-    </section>
-  </main>
+    <div class="drum-container">
+        <h1>Drum Pad</h1>
+        <div class="drum-grid">
+            <div class="drum-pad" data-sound="kick">Kick</div>
+            <div class="drum-pad" data-sound="snare">Snare</div>
+            <div class="drum-pad" data-sound="hihat">HiHat</div>
+            <div class="drum-pad" data-sound="clap">Clap</div>
+            <div class="drum-pad" data-sound="tom">Tom</div>
+            <div class="drum-pad" data-sound="cymbal">Cymbal</div>
+            <div class="drum-pad" data-sound="ride">Ride</div>
+            <div class="drum-pad" data-sound="rimshot">Rimshot</div>
+        </div>
+    </div>
+    <div>
+        <div class="controls">
+            <button id="record-btn">Record</button>
+            <button id="stop-btn">Stop</button>
+            <button id="play-btn">Play</button>
+        </div>
+        
+    </div>
+    <script src="drum.js"></script>
 </body>
 </html>

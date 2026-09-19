@@ -1,59 +1,81 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>PIANOnline</title>
-    <link rel="stylesheet" href="style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="app.js" defer></script>
-  </head>
-  <body>
-    <button class="nav-toggle" onclick="openNav()">☰ Menu</button>
-    <nav class="nav-bar" id="nav-bar">
-      <span class="close-btn" onclick="closeNav()">×</span>
-      <a href="index.html">Home</a>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PIANOnline — a browser-based virtual piano and drum pad with recording and playback.">
+  <title>PIANOnline — Virtual Piano</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="PIANOnline home">🎹 PIANOnline</a>
+    <button class="nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false">☰ Menu</button>
+    <nav class="nav-bar" id="site-nav" aria-label="Main navigation">
+      <button class="close-btn" id="nav-close" type="button" aria-label="Close menu">×</button>
+      <a href="index.html" aria-current="page">Piano</a>
       <a href="drum.html">Drum Pad</a>
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
-      <a href="devs.html">Devs</a>
+      <a href="devs.html">Developers</a>
     </nav>
+  </header>
 
-    <div class="wrapper">
-      <header>
-        <h2>PIANOnline</h2>
-        <div class="column volume-slider">
-          <span>Volume</span><input type="range" min="0" max="1" value="0.5" step="any">
-        </div>
-        <div class="column keys-checkbox">
-          <span>Show Keys</span><input type="checkbox" checked>
-        </div>
-      </header>
-      <ul class="piano-keys">
-        <li class="key white" data-key="a"><span>c</span></li>
-        <li class="key black" data-key="w"><span>c#</span></li>
-        <li class="key white" data-key="s"><span>d</span></li>
-        <li class="key black" data-key="e"><span>d#</span></li>
-        <li class="key white" data-key="d"><span>e</span></li>
-        <li class="key white" data-key="f"><span>f</span></li>
-        <li class="key black" data-key="t"><span>f#</span></li>
-        <li class="key white" data-key="g"><span>g</span></li>
-        <li class="key black" data-key="y"><span>g#</span></li>
-        <li class="key white" data-key="h"><span>a</span></li>
-        <li class="key black" data-key="u"><span>a#</span></li>
-        <li class="key white" data-key="j"><span>b</span></li>
-        <li class="key white" data-key="k"><span>c</span></li>
-        <li class="key black" data-key="o"><span>c#</span></li>
-        <li class="key white" data-key="l"><span>d</span></li>
-        <li class="key black" data-key="p"><span>d#</span></li>
-        <li class="key white" data-key=";"><span>e</span></li>
-      </ul>
-      <div class="controls">
-        <button id="start-recording">Start Recording</button>
-        <button id="stop-recording" disabled>Stop Recording</button>
-        <button id="play-recording" disabled>Play Recording</button>
-        <button id="save-recording" disabled>Save Recording</button>
+  <main class="wrapper">
+    <section class="hero" aria-labelledby="piano-title">
+      <div>
+        <p class="eyebrow">Play • Record • Replay</p>
+        <h1 id="piano-title">Virtual Piano</h1>
+        <p class="subtitle">Use your mouse, touch screen, or keyboard. No microphone is required for recording.</p>
       </div>
-    </div>
+      <div class="settings" aria-label="Piano settings">
+        <label class="control">
+          <span>Volume</span>
+          <input id="volume-slider" type="range" min="0" max="1" value="0.5" step="0.01" aria-label="Piano volume">
+        </label>
+        <label class="switch-control">
+          <span>Show keys</span>
+          <input id="keys-checkbox" type="checkbox" checked>
+        </label>
+      </div>
+    </section>
 
-  </body>
+    <section class="piano-shell" aria-label="Playable piano">
+      <ul class="piano-keys" id="piano-keys">
+        <li class="key white" data-key="a" data-note="C4"><span>C</span><small>A</small></li>
+        <li class="key black" data-key="w" data-note="C#4"><span>C♯</span><small>W</small></li>
+        <li class="key white" data-key="s" data-note="D4"><span>D</span><small>S</small></li>
+        <li class="key black" data-key="e" data-note="D#4"><span>D♯</span><small>E</small></li>
+        <li class="key white" data-key="d" data-note="E4"><span>E</span><small>D</small></li>
+        <li class="key white" data-key="f" data-note="F4"><span>F</span><small>F</small></li>
+        <li class="key black" data-key="t" data-note="F#4"><span>F♯</span><small>T</small></li>
+        <li class="key white" data-key="g" data-note="G4"><span>G</span><small>G</small></li>
+        <li class="key black" data-key="y" data-note="G#4"><span>G♯</span><small>Y</small></li>
+        <li class="key white" data-key="h" data-note="A4"><span>A</span><small>H</small></li>
+        <li class="key black" data-key="u" data-note="A#4"><span>A♯</span><small>U</small></li>
+        <li class="key white" data-key="j" data-note="B4"><span>B</span><small>J</small></li>
+        <li class="key white" data-key="k" data-note="C5"><span>C</span><small>K</small></li>
+        <li class="key black" data-key="o" data-note="C#5"><span>C♯</span><small>O</small></li>
+        <li class="key white" data-key="l" data-note="D5"><span>D</span><small>L</small></li>
+        <li class="key black" data-key="p" data-note="D#5"><span>D♯</span><small>P</small></li>
+        <li class="key white" data-key=";" data-note="E5"><span>E</span><small>;</small></li>
+      </ul>
+      <p class="status" id="audio-status" role="status" aria-live="polite">Click a key to start the piano.</p>
+    </section>
+
+    <section class="recorder" aria-labelledby="recorder-title">
+      <div>
+        <h2 id="recorder-title">Performance recorder</h2>
+        <p id="recording-status">Ready to record your piano performance.</p>
+      </div>
+      <div class="controls">
+        <button class="btn success" id="start-recording" type="button">● Start Recording</button>
+        <button class="btn danger" id="stop-recording" type="button" disabled>■ Stop</button>
+        <button class="btn primary" id="play-recording" type="button" disabled>▶ Play Recording</button>
+        <button class="btn warning" id="save-recording" type="button" disabled>⬇ Save WAV</button>
+      </div>
+    </section>
+  </main>
+</body>
 </html>

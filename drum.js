@@ -1,100 +1,243 @@
-function openNav() {
-    document.getElementById("nav").style.left = "0";
+(() => {
+  "use strict";
+
+  const pads = [...document.querySelectorAll(".drum-pad")];
+  const statusEl = document.querySelector("#drum-status");
+  const recordBtn = document.querySelector("#record-btn");
+  const stopBtn = document.querySelector("#stop-btn");
+  const playBtn = document.querySelector("#play-btn");
+  const saveBtn = document.querySelector("#save-btn");
+  const navToggle = document.querySelector("#nav-toggle");
+  const navClose = document.querySelector("#nav-close");
+  const nav = document.querySelector("#site-nav");
+
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const sounds = new Map([
+    ["kick", "sounds/kick.wav"],
+    ["snare", "sounds/snare.wav"],
+    ["hihat", "sounds/hi-hat.ogg"],
+    ["clap", "sounds/clap.wav"],
+    ["tom", "sounds/tom.wav"],
+    ["cymbal", "sounds/cymbal.wav"],
+    ["ride", "sounds/ride.wav"],
+    ["rimshot", "sounds/rimshot.wav"]
+  ]);
+  const keyMap = new Map([
+    ["a", "kick"], ["s", "snare"], ["d", "hihat"], ["f", "clap"],
+    ["g", "tom"], ["h", "cymbal"], ["j", "ride"], ["k", "rimshot"]
+  ]);
+
+  let context = null;
+  let masterGain = null;
+  let recordDestination = null;
+  let buffers = new Map();
+  let mediaRecorder = null;
+  let chunks = [];
+  let recordingBlob = null;
+  let recordingUrl = null;
+  let sequence = [];
+  let recordingStart = 0;
+  let isRecording = false;
+  let timers = [];
+
+  function setStatus(message) {
+    statusEl.textContent = message;
   }
-function closeNav() {
-    document.getElementById("nav").style.left = "-250px";
-}
 
-const drumPads = document.querySelectorAll('.drum-pad');
-
-// Map each pad to a sound file
-const drumSounds = {
-    kick: 'sounds/kick.wav',
-    snare: 'sounds/snare.wav',
-    hihat: 'sounds/hi-hat.ogg',
-    clap: 'sounds/clap.wav',
-    tom: 'sounds/tom.wav',
-    cymbal: 'sounds/cymbal.wav',
-    ride: 'sounds/ride.wav',
-    rimshot: 'sounds/rimshot.wav'
-};
-
-// Function to play sound
-const playDrumSound = (pad) => {
-    const sound = new Audio(drumSounds[pad]);
-    sound.play();
-};
-
-// Event Listener for Clicks
-drumPads.forEach(pad => {
-    pad.addEventListener('click', () => {
-        const sound = pad.dataset.sound;
-        playDrumSound(sound);
-        recordDrum(sound); // Record the sound
-    });
-});
-
-// Event Listener for Keyboard Presses
-document.addEventListener('keydown', (e) => {
-    const keyMap = {
-        'a': 'kick',
-        's': 'snare',
-        'd': 'hihat',
-        'f': 'clap',
-        'g': 'tom',
-        'h': 'cymbal',
-        'j': 'ride',
-        'k': 'rimshot'
-    };
-    const sound = keyMap[e.key];
-    if (sound) {
-        playDrumSound(sound);
-        document.querySelector(`[data-sound="${sound}"]`).classList.add('active');
-        setTimeout(() => {
-            document.querySelector(`[data-sound="${sound}"]`).classList.remove('active');
-        }, 150);
-        recordDrum(sound); // Record the sound
+  async function ensureAudio() {
+    if (!AudioContextClass) throw new Error("Web Audio is not supported by this browser.");
+    if (!context) {
+      context = new AudioContextClass();
+      masterGain = context.createGain();
+      masterGain.gain.value = 0.8;
+      masterGain.connect(context.destination);
+      recordDestination = context.createMediaStreamDestination();
+      masterGain.connect(recordDestination);
     }
-});
+    if (context.state === "suspended") await context.resume();
+  }
 
-// Recording Logic
-let isRecording = false;
-let drumSequence = [];
-let startTime;
+  function mimeType() {
+    if (!window.MediaRecorder) return "";
+    return ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"]
+      .find((type) => MediaRecorder.isTypeSupported(type)) || "";
+  }
 
-// Start Recording
-document.querySelector('#record-btn').addEventListener('click', () => {
-    isRecording = true;
-    drumSequence = [];
-    startTime = Date.now();
-});
+  async function loadSounds() {
+    if (buffers.size === sounds.size) return;
+    await ensureAudio();
+    setStatus("Loading drum sounds…");
 
-// Stop Recording
-document.querySelector('#stop-btn').addEventListener('click', () => {
+    await Promise.all([...sounds.entries()].map(async ([name, url]) => {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Could not load ${url}`);
+      const data = await response.arrayBuffer();
+      buffers.set(name, await context.decodeAudioData(data));
+    }));
+
+    setStatus("Drum pad ready — use A S D F G H J K.");
+  }
+
+  function flashPad(name) {
+    const pad = document.querySelector(`.drum-pad[data-sound="${CSS.escape(name)}"]`);
+    if (!pad) return;
+    pad.classList.add("active");
+    setTimeout(() => pad.classList.remove("active"), 120);
+  }
+
+  async function playSound(name, shouldRecord = true) {
+    if (!sounds.has(name)) return;
+    try {
+      await loadSounds();
+      const source = context.createBufferSource();
+      source.buffer = buffers.get(name);
+      source.connect(masterGain);
+      source.start();
+      flashPad(name);
+
+      if (isRecording && shouldRecord) {
+        sequence.push({ sound: name, time: performance.now() - recordingStart });
+      }
+    } catch (error) {
+      console.error(error);
+      setStatus("The drum sound could not be loaded.");
+    }
+  }
+
+  function clearTimers() {
+    timers.forEach(clearTimeout);
+    timers = [];
+  }
+
+  function resetRecording() {
+    chunks = [];
+    sequence = [];
+    recordingBlob = null;
+    if (recordingUrl) URL.revokeObjectURL(recordingUrl);
+    recordingUrl = null;
+  }
+
+  async function startRecording() {
+    if (isRecording) return;
+    try {
+      await loadSounds();
+      const type = mimeType();
+      if (!recordDestination || !type) throw new Error("Audio recording is not supported by this browser.");
+
+      resetRecording();
+      isRecording = true;
+      recordingStart = performance.now();
+      mediaRecorder = new MediaRecorder(recordDestination.stream, { mimeType: type });
+      mediaRecorder.addEventListener("dataavailable", (event) => {
+        if (event.data?.size) chunks.push(event.data);
+      });
+      mediaRecorder.addEventListener("stop", () => {
+        recordingBlob = new Blob(chunks, { type: mediaRecorder.mimeType || type });
+        recordingUrl = URL.createObjectURL(recordingBlob);
+        playBtn.disabled = !recordingBlob.size;
+        saveBtn.disabled = !recordingBlob.size;
+        setStatus(recordingBlob.size ? "Recording ready." : "No audio was captured.");
+      }, { once: true });
+      mediaRecorder.start(100);
+
+      recordBtn.disabled = true;
+      stopBtn.disabled = false;
+      playBtn.disabled = true;
+      saveBtn.disabled = true;
+      setStatus("Recording…");
+    } catch (error) {
+      console.error(error);
+      isRecording = false;
+      setStatus(error.message);
+    }
+  }
+
+  function stopRecording() {
+    if (!isRecording) return;
     isRecording = false;
-});
+    if (mediaRecorder?.state !== "inactive") mediaRecorder.stop();
+    recordBtn.disabled = false;
+    stopBtn.disabled = true;
+    setStatus("Recording stopped.");
+  }
 
-// Record the played sound
-const recordDrum = (sound) => {
-    if (isRecording) {
-        const time = Date.now() - startTime;
-        drumSequence.push({ sound, time });
-    }
-};
+  function playRecording() {
+    clearTimers();
 
-// Play Recorded Sequence
-document.querySelector('#play-btn').addEventListener('click', () => {
-    if (drumSequence.length === 0) {
-        alert('No recording to play!');
-        return;
+    if (recordingUrl) {
+      const audio = new Audio(recordingUrl);
+      audio.play().catch(() => setStatus("Press Play again to start playback."));
+      return;
     }
-    drumSequence.forEach(note => {
-        setTimeout(() => {
-            playDrumSound(note.sound);
-            document.querySelector(`[data-sound="${note.sound}"]`).classList.add('active');
-            setTimeout(() => {
-                document.querySelector(`[data-sound="${note.sound}"]`).classList.remove('active');
-            }, 150);
-        }, note.time);
+
+    if (!sequence.length) {
+      setStatus("There is no recording to play.");
+      return;
+    }
+
+    const started = performance.now();
+    sequence.forEach((note) => {
+      const delay = Math.max(0, note.time - (performance.now() - started));
+      timers.push(setTimeout(() => playSound(note.sound, false), delay));
     });
-});
+  }
+
+  function saveRecording() {
+    if (!recordingBlob?.size) return;
+    const extension = recordingBlob.type.includes("ogg") ? "ogg" : "webm";
+    const url = URL.createObjectURL(recordingBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `pianonline-drums.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  pads.forEach((pad) => {
+    pad.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      playSound(pad.dataset.sound);
+    });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+    const sound = keyMap.get(event.key.toLowerCase());
+    if (!sound) return;
+    event.preventDefault();
+    playSound(sound);
+  });
+
+  recordBtn.addEventListener("click", startRecording);
+  stopBtn.addEventListener("click", stopRecording);
+  playBtn.addEventListener("click", playRecording);
+  saveBtn.addEventListener("click", saveRecording);
+
+  navToggle.addEventListener("click", () => {
+    nav.classList.add("open");
+    navToggle.setAttribute("aria-expanded", "true");
+  });
+  navClose.addEventListener("click", () => {
+    nav.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+    navToggle.focus();
+  });
+  nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
+    nav.classList.remove("open");
+    navToggle.setAttribute("aria-expanded", "false");
+  }));
+
+  window.addEventListener("pagehide", () => {
+    clearTimers();
+    if (recordingUrl) URL.revokeObjectURL(recordingUrl);
+    if (context && context.state !== "closed") context.close();
+  });
+
+  loadSounds().catch((error) => {
+    console.error(error);
+    setStatus("Could not load the drum sounds.");
+  });
+})();

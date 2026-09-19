@@ -1,161 +1,154 @@
-:root {
-  --bg: #0d1016;
-  --panel: #191f2a;
-  --border: #364152;
-  --text: #f7f8fb;
-  --muted: #aab3c2;
-  --accent: #6f8cff;
-  --active: #e6a93a;
-}
-
-* { box-sizing: border-box; }
-
-html { min-width: 320px; }
-
 body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: Poppins, Arial, sans-serif;
-  color: var(--text);
-  background: radial-gradient(circle at top, #2b3345, var(--bg) 55%);
-}
-
-button, a { font: inherit; }
-button:focus-visible, a:focus-visible { outline: 3px solid #9eb5ff; outline-offset: 3px; }
-
-.site-header {
-  width: min(1180px, calc(100% - 32px));
-  margin: auto;
-  padding: 18px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.brand { color: var(--text); text-decoration: none; font-weight: 700; font-size: 1.3rem; }
-
-.nav-toggle, .close-btn {
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--text);
-  border-radius: 9px;
-  padding: 9px 14px;
-  min-height: 44px;
-  cursor: pointer;
-}
-
-.nav-toggle { display: none; }
-
-.nav {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.nav a {
-  color: var(--muted);
-  text-decoration: none;
-  padding: 10px 12px;
-  border-radius: 8px;
-}
-
-.nav a:hover, .nav a[aria-current="page"] { color: var(--text); background: var(--panel); }
-.close-btn { display: none; }
-
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    animation: backgroundShift 10s ease infinite;
+  }
+  
+  @keyframes backgroundShift {
+    0% {
+      background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    }
+    50% {
+      background: linear-gradient(135deg, #BBDEFB 0%, #E3F2FD 100%);
+    }
+    100% {
+      background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    }
+  }
+  
 .drum-container {
-  width: min(900px, calc(100% - 28px));
-  margin: 50px auto;
-  text-align: center;
+    margin-top: 20px;
 }
 
-.eyebrow {
-  color: #93aaff;
-  text-transform: uppercase;
-  font-size: .8rem;
-  font-weight: 600;
-  letter-spacing: .06em;
-  margin-bottom: 8px;
+h1 {
+    font-size: 3em;
+    color: #ff4081;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
 }
 
-h1 { font-size: clamp(2.3rem, 7vw, 4rem); margin: 0 0 8px; }
-#drum-status { color: var(--muted); min-height: 24px; }
-
+/* Grid Design for Drum Pads */
 .drum-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    transition: transform 0.3s ease;
 }
 
 .drum-pad {
-  min-height: 150px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: linear-gradient(145deg, #252c38, #151a22);
-  color: var(--text);
-  font-size: 1.35rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 10px 22px rgba(0,0,0,.25);
-  touch-action: manipulation;
+    background: linear-gradient(145deg, #333, #444);
+    border: 2px solid #555;
+    border-radius: 15px;
+    padding: 40px;
+    font-size: 2em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    user-select: none;
 }
 
-.drum-pad small {
-  display: block;
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: .8rem;
+.drum-pad:hover {
+    background: linear-gradient(145deg, #555, #666);
+    transform: scale(1.1);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
 }
 
-.drum-pad:hover { transform: translateY(-2px); }
-.drum-pad.active { background: var(--active); color: #15110a; transform: translateY(2px); }
-.drum-pad.active small { color: #15110a; }
+.drum-pad.active {
+    background-color: #00e676;
+    box-shadow: 0 0 25px #00e676, 0 0 50px rgba(0, 230, 118, 0.5);
+    transform: scale(1.05);
+    transition: all 0.1s ease;
+}
 
+.drum-pad:active {
+    background-color: #ff4081;
+    box-shadow: 0 0 15px #ff4081;
+    transform: scale(1.15);
+}
+
+/* Controls Styling */
 .controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 26px;
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
 }
 
 .controls button {
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--panel);
-  color: var(--text);
-  padding: 11px 16px;
-  min-height: 44px;
-  cursor: pointer;
+    background: #444;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-.controls button:disabled { opacity: .45; cursor: not-allowed; }
-.controls button:hover:not(:disabled) { border-color: var(--accent); }
+.controls button:hover {
+    background-color: #777;
+    transform: translateY(-5px);
+}
 
-@media (max-width: 900px) {
-  .nav-toggle { display: block; }
-  .nav {
+.controls button:active {
+    background-color: #ff4081;
+    box-shadow: 0 0 15px #ff4081;
+    transform: translateY(2px);
+}
+
+.nav {
     position: fixed;
-    inset: 0 auto 0 0;
-    width: min(300px, 86vw);
-    padding: 72px 20px 20px;
-    background: #141922;
-    border-right: 1px solid var(--border);
-    flex-direction: column;
-    align-items: stretch;
-    transform: translateX(-105%);
-    transition: transform .25s ease;
-    z-index: 10;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background: #333;
+    color: #fff;
+    transition: 0.3s;
+    padding-top: 60px;
+    text-align: left;
   }
-  .nav.open { transform: translateX(0); }
-  .close-btn { display: block; position: absolute; top: 16px; right: 16px; }
-}
-
-@media (max-width: 650px) {
-  .drum-grid { grid-template-columns: repeat(2, 1fr); }
-  .drum-pad { min-height: 120px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; }
-}
+  .nav a {
+    padding: 10px 20px;
+    text-decoration: none;
+    display: block;
+    color: #ddd;
+    transition: 0.3s;
+  }
+  .nav a:hover {
+    background: #575757;
+    color: #fff;
+  }
+  .open-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #333;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+  }
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 25px;
+    cursor: pointer;
+    color: white;
+  }

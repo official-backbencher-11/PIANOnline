@@ -227,8 +227,4 @@
     if (context && context.state !== "closed") context.close();
   });
 
-  loadSounds().catch((error) => {
-    console.error(error);
-    setStatus("Could not load the drum sounds.");
-  });
 })();

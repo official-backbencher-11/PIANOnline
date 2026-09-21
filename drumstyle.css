@@ -157,3 +157,12 @@ h1 {
 .nav-toggle:hover {
     background-color: #00e676;
 }
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 25px;
+    cursor: pointer;
+    color: white;
+}

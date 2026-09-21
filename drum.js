@@ -1,8 +1,8 @@
 function openNav() {
-    document.getElementById("nav").style.left = "0";
+    document.getElementById("nav-bar").style.left = "0";
   }
 function closeNav() {
-    document.getElementById("nav").style.left = "-250px";
+    document.getElementById("nav-bar").style.left = "-250px";
 }
 
 const drumPads = document.querySelectorAll('.drum-pad');

@@ -61,16 +61,17 @@
 </head>
 <body>
   <!-- Navigation Button -->
-  <button class="open-btn" onclick="openNav()">☰ Menu</button>
+  <button class="nav-toggle" onclick="openNav()">☰ Menu</button>
 
   <!-- Navigation Bar -->
-  <div class="nav" id="nav">
+  <nav class="nav-bar" id="nav-bar">
     <span class="close-btn" onclick="closeNav()">×</span>
     <a href="index.html">Home</a>
     <a href="drum.html">Drum Pad</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
-  </div>
+    <a href="devs.html">Devs</a>
+  </nav>
 
   
   <div class="content">
@@ -99,10 +100,10 @@
   <!-- JavaScript -->
   <script>
     function openNav() {
-      document.getElementById("nav").style.left = "0";
+      document.getElementById("nav-bar").style.left = "0";
     }
     function closeNav() {
-      document.getElementById("nav").style.left = "-250px";
+      document.getElementById("nav-bar").style.left = "-250px";
     }
   </script>
 </body>

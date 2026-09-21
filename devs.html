@@ -105,16 +105,17 @@
 </head>
 <body>
   <!-- Navigation Button -->
-  <button class="open-btn" onclick="openNav()">☰ Menu</button>
+  <button class="nav-toggle" onclick="openNav()">☰ Menu</button>
 
   <!-- Navigation Bar -->
-  <div class="nav" id="nav">
+  <nav class="nav-bar" id="nav-bar">
     <span class="close-btn" onclick="closeNav()">×</span>
     <a href="index.html">Home</a>
+    <a href="drum.html">Drum Pad</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
     <a href="devs.html">Devs</a>
-  </div>
+  </nav>
 
   <!-- Devs Section -->
   <h1>Meet the Developers</h1>
@@ -123,9 +124,9 @@
       <img src="pics/shivam.jpg" alt="Developer Image">
       <h3>Shivam Singh</h3>
       <div class="social-links">
-        <a href="https://github.com/official-backbencher-11" target="_blank"><i>GitHub</i></a>
-        <a href="https://linkedin.com/in/shivam-singh-654080298" target="_blank"><i>LinkedIn</i></a>
-        <a href="https://instagram.com/_official_backbencher_11" target="_blank"><i>Instagram</i></a>
+        <a href="https://github.com/official-backbencher-11" target="_blank" rel="noopener noreferrer"><i>GitHub</i></a>
+        <a href="https://linkedin.com/in/shivam-singh-654080298" target="_blank" rel="noopener noreferrer"><i>LinkedIn</i></a>
+        <a href="https://instagram.com/_official_backbencher_11" target="_blank" rel="noopener noreferrer"><i>Instagram</i></a>
       </div>
     </div>
     
@@ -133,9 +134,9 @@
       <img src="pics/subrat.jpeg" alt="Developer Image">
       <h3>Subrat Dwivedi</h3>
       <div class="social-links">
-        <a href="https://github.com/subrat-dwi" target="_blank"><i>GitHub</i></a>
-        <a href="https://linkedin.com/in/subrat-dwivedi" target="_blank"><i>LinkedIn</i></a>
-        <a href="https://instagram.com/dw1subrat" target="_blank"><i>Instagram</i></a>
+        <a href="https://github.com/subrat-dwi" target="_blank" rel="noopener noreferrer"><i>GitHub</i></a>
+        <a href="https://linkedin.com/in/subrat-dwivedi" target="_blank" rel="noopener noreferrer"><i>LinkedIn</i></a>
+        <a href="https://instagram.com/dw1subrat" target="_blank" rel="noopener noreferrer"><i>Instagram</i></a>
       </div>
     </div>
   </div>
@@ -143,10 +144,10 @@
   <!-- JavaScript -->
   <script>
     function openNav() {
-      document.getElementById("nav").style.left = "0";
+      document.getElementById("nav-bar").style.left = "0";
     }
     function closeNav() {
-      document.getElementById("nav").style.left = "-250px";
+      document.getElementById("nav-bar").style.left = "-250px";
     }
   </script>
 </body>
